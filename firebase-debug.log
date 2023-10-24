@@ -1,0 +1,18 @@
+[debug] [2023-10-20T05:13:07.219Z] ----------------------------------------------------------------------
+[debug] [2023-10-20T05:13:07.221Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy --only functions
+[debug] [2023-10-20T05:13:07.222Z] CLI Version:   12.7.0
+[debug] [2023-10-20T05:13:07.222Z] Platform:      darwin
+[debug] [2023-10-20T05:13:07.222Z] Node Version:  v16.17.1
+[debug] [2023-10-20T05:13:07.224Z] Time:          Fri Oct 20 2023 00:13:07 GMT-0500 (Central Daylight Time)
+[debug] [2023-10-20T05:13:07.224Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-10-20T05:13:07.299Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-10-20T05:13:07.300Z] > authorizing via signed-in user (jonathanandrewtrevino@gmail.com)
+[debug] [2023-10-20T05:13:07.300Z] [iam] checking project clinkz-42a4b for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2023-10-20T05:13:07.302Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/clinkz-42a4b:testIamPermissions [none]
+[debug] [2023-10-20T05:13:07.302Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/clinkz-42a4b:testIamPermissions x-goog-quota-user=projects/clinkz-42a4b
+[debug] [2023-10-20T05:13:07.303Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/clinkz-42a4b:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2023-10-20T05:13:07.650Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/clinkz-42a4b:testIamPermissions 200
+[debug] [2023-10-20T05:13:07.650Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/clinkz-42a4b:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2023-10-20T05:13:07.650Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/clinkz-42a4b/serviceAccounts/clinkz-42a4b@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2023-10-20T05:13:07.651Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/clinkz-42a4b/serviceAccounts/clinkz-42a4b@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
