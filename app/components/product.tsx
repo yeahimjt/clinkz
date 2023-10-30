@@ -82,18 +82,18 @@ const Product = ({ id }: ProductProps) => {
           </div>
           <div className='flex flex-[0.7] items-end justify-end'>
             <div className='grid flex-[1]  grid-cols-2 items-end justify-end gap-[10px]'>
-              <div className='flex items-center justify-center gap-[5px] border border-my-gray/10 bg-my-blue text-white'>
+              <div className='flex items-center justify-center gap-[5px] border border-my-gray/10 bg-my-blue/10 '>
                 <Flame className='h-[40px] w-[40px]' />${product?.lowest_price}
               </div>
-              <div className='flex items-center justify-center gap-[5px] border border-my-gray/10 bg-my-blue text-white'>
+              <div className='flex items-center justify-center gap-[5px] border border-my-gray/10 bg-my-blue/10 '>
                 <ArrowDown className='h-[40px] w-[40px]' />$
                 {product?.current_price}
               </div>
-              <div className='flex items-center justify-center gap-[5px] border border-my-gray/10 bg-my-blue text-white'>
+              <div className='flex items-center justify-center gap-[5px] border border-my-gray/10 bg-my-blue/10 '>
                 <TrendingUp className='h-[40px] w-[40px] ' />$
                 {product?.highest_price}
               </div>
-              <div className='flex items-center justify-center gap-[5px] border border-my-gray/10 bg-my-blue text-white'>
+              <div className='flex items-center justify-center gap-[5px] border border-my-gray/10 bg-my-blue/10 '>
                 <AlignVerticalSpaceAround className='h-[40px] w-[40px]' />$
                 {product?.average_price}
               </div>

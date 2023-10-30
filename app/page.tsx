@@ -1,9 +1,9 @@
-import Image from 'next/image';
 import Nav from './components/nav';
 import Header from './components/header';
-import Auth_Modal from './components/modal';
 import Recent_Products from './components/recent_products';
 import Auth_Dialog from './components/dialog';
+import { Toaster } from '@/components/ui/toaster';
+import Footer from './components/footer';
 
 export default function Home() {
   return (
@@ -11,7 +11,9 @@ export default function Home() {
       <Nav />
       <Header />
       <Recent_Products />
+      <Footer />
       <Auth_Dialog />
+      <Toaster />
     </main>
   );
 }

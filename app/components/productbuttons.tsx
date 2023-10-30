@@ -8,7 +8,7 @@ import Add_List from '@/public/icons/add_list.svg';
 import { useModalStore } from '../states';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase';
-
+import { Mailbox, Blocks } from 'lucide-react';
 interface ButtonProps {
   id: string;
   url: string;
@@ -24,12 +24,14 @@ const ProductButtons = ({ id, url }: ButtonProps) => {
   };
   const handleAddClick = (e: any) => {
     e.preventDefault();
+    setProductID(id);
+    setModalType('add_list');
+    openModal();
   };
-  console.log(productID);
   return (
     <div className=' z-20 flex items-center gap-[10px]'>
       <button
-        className='border-my-gray hover:bg-my-light-gray h-[40px] w-[40px] rounded-[5px] border p-2'
+        className='rounded-[5px] border  p-1 hover:border-my-blue'
         onClick={
           user
             ? (e) => handleTrackClick(e)
@@ -40,31 +42,21 @@ const ProductButtons = ({ id, url }: ButtonProps) => {
               }
         }
       >
-        <Image
-          className='mx-auto'
-          src={Track}
-          width={30}
-          height={30}
-          alt='track icon'
-        />
+        <Mailbox className='h-[30px] w-[30px]' />
       </button>
-      <button className='border-my-gray hover:bg-my-light-gray h-[40px] w-[40px] rounded-[5px] border p-2'>
-        <Image
-          className='mx-auto'
-          src={Add_List}
-          width={30}
-          height={30}
-          alt='add to list icon'
-        />
-      </button>
-      <button className='border-my-gray hover:bg-my-light-gray h-[40px] w-[40px] rounded-[5px] border p-2'>
-        <Image
-          className='mx-auto'
-          src={Redirect}
-          width={30}
-          height={30}
-          alt='go to icon'
-        />
+      <button
+        className='rounded-[5px] border p-1 hover:border-my-blue'
+        onClick={
+          user
+            ? (e) => handleAddClick(e)
+            : (e) => {
+                e.preventDefault();
+                setModalType('auth');
+                openModal();
+              }
+        }
+      >
+        <Blocks className='h-[30px] w-[30px]' />
       </button>
     </div>
   );

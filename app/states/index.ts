@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { Subscription } from '../constants';
 
 interface ModalStore {
   modalType: string;
@@ -18,4 +19,14 @@ export const useModalStore = create<ModalStore>((set) => ({
   isOpen: false,
   openModal: () => set({ isOpen: true }),
   closeModal: () => set({ isOpen: false }),
+}));
+
+interface SubscriptionState {
+  subscription: Subscription | null | undefined;
+  setSubscription: (subscription: Subscription | null) => void;
+}
+
+export const useSubscriptionStore = create<SubscriptionState>((set) => ({
+  subscription: undefined,
+  setSubscription: (subscription: Subscription | null) => set({ subscription }),
 }));

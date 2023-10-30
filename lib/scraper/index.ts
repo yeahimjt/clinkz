@@ -7,29 +7,27 @@ import { formatPrice } from '../utils';
 export async function scrapeAmazonProduct(url: string) {
   if (!url) return;
 
-  // curl --proxy brd.superproxy.io:22225 --proxy-user brd-customer-hl_5fd1f8a8-zone-clinkz:r9yovyc23q2c -k https://lumtest.com/myip.json
-
-  // Configure Bright Data
-  const username = String(process.env.BRIGHT_DATA_USERNAME);
-  const password = String(process.env.BRIGHT_DATA_PASSWORD);
-  const port = 22225;
-  const session_id = (1000000 * Math.random()) | 0;
-  const options = {
-    auth: {
-      username: `${username}-session-${session_id}`,
-      password,
-    },
-    host: 'brd.superproxy.io',
-    port,
-    rejectUnauthorized: false,
-  };
-
+  const apiKey = String(process.env.SCRAPERAPI_API_KEY); // Replace with your ScrapingBee API key
   try {
-    // Fetch Product Page
-    const response = await axios.get(url, options);
+    // Set up the ScrapingBee API request
+    const scrapingBeeUrl = `http://api.scraperapi.com?api_key=${apiKey}&url=${encodeURIComponent(
+      url
+    )}`;
+
+    const response = await axios.get(scrapingBeeUrl);
+
+    if (response.status !== 200) {
+      console.log(`Failed to scrape product - HTTP Status: ${response.status}`);
+      return null;
+    }
+
     const $ = cheerio.load(response.data);
-    const title = $('#productTitle').text();
-    const price = formatPrice($('.a-offscreen:first'));
+    let title = $('#productTitle').text().trim();
+    console.log(title);
+
+    if (!title) return null;
+
+    const price = formatPrice($('.a-offscreen:first').text());
     const rating = $(
       '.a-popover-trigger.a-declarative .a-size-base.a-color-base:first'
     ).text();
@@ -46,6 +44,7 @@ export async function scrapeAmazonProduct(url: string) {
       .split('%')[0]
       .split('r')[1];
     const image = $('img.a-dynamic-image').attr('src');
+
     return {
       url: String(url),
       title,
@@ -61,6 +60,6 @@ export async function scrapeAmazonProduct(url: string) {
       id: undefined,
     };
   } catch (error: any) {
-    throw new Error(`Failed to scrape product ${error.message}`);
+    console.log(`Failed to scrape product ${error.message}`);
   }
 }

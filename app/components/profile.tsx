@@ -13,10 +13,11 @@ import {
 import { MoreHorizontal } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase';
+import { app, auth } from '../firebase';
 import { redirect } from 'next/navigation';
-
+import { Pencil, LogOut } from 'lucide-react';
 import TrackingDataTable from '../profile/data-table';
+import { useRouter } from 'next/navigation';
 import {
   getUserTracking,
   updateProductWithoutUserEmail,
@@ -28,28 +29,25 @@ import {
   updateCurrentUser,
   updateProfile,
 } from 'firebase/auth';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
+import { getCheckoutUrl } from '@/lib/stripePayments';
+import Link from 'next/link';
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
+import { subscriptionRef } from '../converters/Subscription';
+import { useSubscriptionStore } from '../states';
+import { toast, useToast } from '@/components/ui/use-toast';
 
 const Profile = () => {
   const [user, loading, error] = useAuthState(auth);
-  const [data, setData] = useState<ProductTable[]>();
+  const [data, setData] = useState<ProductTable[]>([]);
+  const [userChecked, setUserChecked] = useState(false);
   const [triggerUpdate, setTriggerUpdate] = useState(false);
-  const [profileData, setProfileData] = useState<{
-    displayName: string;
-    email: string;
-  }>({
-    displayName: user?.displayName || '',
-    email: user?.email || '',
-  });
+  const subscription = useSubscriptionStore((state) => state.subscription);
+  const router = useRouter();
   const columns: ColumnDef<ProductTable>[] = [
     {
       header: 'Title',
@@ -102,139 +100,102 @@ const Profile = () => {
     },
   ];
 
+  useEffect(() => {
+    if (!loading) {
+      setUserChecked(true);
+    }
+  }, [loading]);
+
+  const upgradeSubscription = async () => {
+    const priceId = 'price_1O4hvGLI2RZSgqtdtjs7CLaU';
+    const checkoutUrl = await getCheckoutUrl(app, priceId);
+
+    router.push(checkoutUrl);
+  };
   async function waitForTrackingData() {
-    const returned_data = await getUserTracking(user!.uid);
+    console.log(user!.uid);
+    const returned_data = await getUserTracking(user!.email!);
     setData(returned_data);
   }
-  const handleUpdateUser = async () => {
-    const succeed = await updateUser(
-      user!.uid,
-      profileData.displayName,
-      profileData.email
-    );
-    if (succeed) {
-      updateProfile(user!, {
-        displayName: profileData.displayName,
-      });
-    } else {
-    }
-  };
   useEffect(() => {
     if (user || triggerUpdate) {
       waitForTrackingData();
       setTriggerUpdate(false);
     }
-    if (!user) {
+    if (user === null && userChecked) {
       redirect('/');
     }
   }, [user, triggerUpdate]);
+  console.log(subscription);
   return (
     <section className=' my-12 w-full  bg-white'>
-      <h1 className='text-[25px] text-my-black'>Account</h1>
+      <div className='mb-8 flex justify-between'>
+        <h1 className='text-[28px] font-bold text-my-black'>Profile</h1>
+        <span className='flex gap-[20px]'>
+          <Button
+            className='flex items-center gap-[10px] text-[18px] text-my-black'
+            variant={'outline'}
+          >
+            Edit
+            <Pencil className='aspect-square w-[15px]' />
+          </Button>
+          <Button
+            className='flex items-center gap-[10px] border bg-red-500 text-[18px] text-white hover:border-red-500 hover:bg-white hover:text-my-black'
+            onClick={() => {
+              toast({
+                title: 'Signed Out',
+                description: 'You have been successfully signed out',
+              });
+              signOut(auth);
+            }}
+          >
+            Sign Out
+            <LogOut className='aspect-square w-[15px]' />
+          </Button>
+        </span>
+      </div>
 
-      <Tabs defaultValue='account' className=''>
-        <TabsList className='grid w-full grid-cols-3'>
-          <TabsTrigger value='account'>Profile</TabsTrigger>
-          <TabsTrigger value='subscription'>Subscriptions</TabsTrigger>
-          <TabsTrigger value='payment'>Payment Details</TabsTrigger>
-        </TabsList>
-        <TabsContent value='account'>
-          <Card className=' border-0 shadow-none'>
-            <CardHeader>
-              <CardTitle className='text-[16px] font-normal uppercase text-my-black'>
-                Account Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent className='grid grid-cols-1 space-y-4 sm:grid-cols-2 sm:space-y-0 md:grid-cols-3'>
-              <div className='space-y-1'>
-                <Label htmlFor='full_name'>Full Name</Label>
-                <p>{user?.displayName}</p>
-              </div>
-              <div className='space-y-1'>
-                <Label htmlFor='email'>Email Address</Label>
-                <p>{user?.email}</p>
-              </div>
-              <div className='space-y-1'>
-                <Label htmlFor='email'>Subscription</Label>
-                <p className='w-fit rounded-[5px] bg-my-blue px-8 py-1 text-[12px] text-white'>
-                  Basic
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value='subscription'>
-          <Card className=' border-0 shadow-none'>
-            <CardHeader>
-              <CardTitle>Log In</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-2'>
-              <div className='space-y-1'>
-                <Label htmlFor='full_name'>Full Name</Label>
-                <p>{user?.displayName}</p>
-              </div>
-              <div className='space-y-1'>
-                <Label htmlFor='email'>Email Address</Label>
-                <Input
-                  id='email'
-                  value={profileData.email}
-                  onChange={(e) =>
-                    setProfileData((profileData) => ({
-                      ...profileData,
-                      email: e.currentTarget.value,
-                    }))
-                  }
-                />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button>Update Profile</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-        <TabsContent value='payment'>
-          <Card className=' border-0 shadow-none'>
-            <CardHeader>
-              <CardTitle>Log In</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-2'>
-              <div className='space-y-1'>
-                <Label htmlFor='full_name'>Full Name</Label>
-                <Input
-                  id='full_name'
-                  value={profileData.displayName}
-                  onChange={(e) =>
-                    setProfileData((profileData) => ({
-                      ...profileData,
-                      displayName: e.currentTarget.value,
-                    }))
-                  }
-                />
-              </div>
-              <div className='space-y-1'>
-                <Label htmlFor='email'>Email Address</Label>
-                <Input
-                  id='email'
-                  value={profileData.email}
-                  onChange={(e) =>
-                    setProfileData((profileData) => ({
-                      ...profileData,
-                      email: e.currentTarget.value,
-                    }))
-                  }
-                  //@ts-ignore
-                  placeholder={user ? user.email : undefined}
-                />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button>Update </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-      </Tabs>
-      <div className='p-12'>
-        {data && <TrackingDataTable columns={columns} data={data} />}
+      <div className='flex'>
+        <span className='flex flex-[0.2] flex-col gap-[20px] text-my-black'>
+          <h2>Email</h2>
+          <h2>Name</h2>
+          <h2>Subscription</h2>
+        </span>
+        <span className='relative flex flex-[0.8] flex-col gap-[20px] text-my-gray'>
+          <h2>{user?.email}</h2>
+          <h2>{user?.displayName}</h2>
+          <div className='relative'>
+            <div className='absolute'>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <p className='cursor-pointer rounded-[5px] bg-my-blue px-8 py-1 text-white'>
+                    {!subscription ? 'Basic' : 'Standard'}
+                  </p>
+                </HoverCardTrigger>
+                <HoverCardContent>
+                  <Link href='/subscriptions'>Upgrade Subscription</Link>
+                </HoverCardContent>
+              </HoverCard>
+            </div>
+          </div>
+        </span>
+      </div>
+
+      <h1 className='mb-8 mt-32 text-[28px] font-bold text-my-black'>
+        Tracked Items Management
+      </h1>
+
+      <div className='flex w-full flex-col'>
+        {data ? (
+          <TrackingDataTable columns={columns} data={data} />
+        ) : (
+          <>
+            <TrackingDataTable columns={columns} data={data} />
+            <p className='text-center text-red-500/60'>
+              No tracked items found
+            </p>
+          </>
+        )}
       </div>
     </section>
   );

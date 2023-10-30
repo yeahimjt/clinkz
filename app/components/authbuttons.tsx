@@ -5,19 +5,24 @@ import { auth } from '@/app/firebase';
 import Image from 'next/image';
 import { useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import { useModalStore } from '../states';
+import { toast, useToast } from '@/components/ui/use-toast';
 const AuthButtons = () => {
-  const [signInWithGoogle, userGoogle, loadingGoogle, errorGoogle] =
-    useSignInWithGoogle(auth);
+  const [signInWithGoogle, userGoogle, errorGoogle] = useSignInWithGoogle(auth);
   const { closeModal } = useModalStore();
+  const { toast } = useToast();
   useEffect(() => {
     if (userGoogle) {
+      toast({
+        title: 'Login Successful',
+        description: 'You now have neccessary authorization',
+      });
       closeModal();
     }
   }, [userGoogle]);
   return (
     <div className='flex justify-center pt-4'>
       <button
-        className='bg-my-light-gray/50 hover:bg-my-light-gray rounded-full'
+        className='rounded-full bg-my-light-gray/50 hover:bg-my-light-gray'
         onClick={() => signInWithGoogle()}
       >
         <Image
@@ -27,7 +32,7 @@ const AuthButtons = () => {
           alt='google sign in option'
         />
       </button>
-      {errorGoogle && <p className='text-red-500'>{errorGoogle.message}</p>}
+      {errorGoogle && <p className='text-red-500'></p>}
     </div>
   );
 };

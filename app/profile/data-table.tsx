@@ -32,7 +32,7 @@ export function TrackingDataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
   });
   return (
-    <div>
+    <div className='w-full'>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => {
@@ -65,7 +65,11 @@ export function TrackingDataTable<TData, TValue>({
             ))
           ) : (
             <TableRow>
-              <TableCell>No results</TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
             </TableRow>
           )}
         </TableBody>

@@ -16,27 +16,41 @@ import {
 } from 'firebase/firestore';
 import { scrapeAmazonProduct } from '../scraper';
 import { app, firestore } from '@/app/firebase';
-import { redirect } from 'next/navigation';
+
 import { Product } from '@/app/constants';
 
-export async function handleScrapeAndStore(url: string) {
+export async function handleScrapeAndStore(url: string, user_id: string) {
+  // No URL passed
   if (!url) return false;
+
+  // Check if this specific amazon product link has already been stored to prevent repetitive scraping
   const productStoredId = await checkProductStored(url);
+
+  // Product has already been stored, return true
   if (productStoredId) {
-    redirect(`/product/${productStoredId}`);
+    return true;
   } else {
+    // Scrape the amazon product link
     const productData = await scrapeAmazonProduct(url);
-    if (!productData) return false;
-    const productStoredData = await storeProduct(productData);
-    // Implement check for product being stored?
-    return productStoredData;
+    console.log('productData before check', productData);
+
+    // Scrape unsuccessful (amazon prevented it, brightdata has not switched ip)
+    if (productData == null) return false;
+
+    // Scrape successful, now store the scraped data in the database for future use
+    const productIdStored = await storeProduct(productData, user_id);
+    console.log('returning true');
+    if (productIdStored) {
+      return productIdStored;
+    }
   }
 }
 
-export async function storeProduct(product: Product) {
+export async function storeProduct(product: Product, user_id: string) {
   const db = firestore;
-  const docRef = doc(db, 'products', generateUniqueId());
-  return await setDoc(docRef, {
+  const id = generateUniqueId();
+  const docRef = doc(db, 'items', id);
+  await setDoc(docRef, {
     url: product.url,
     title: product.title,
     current_price: product.current_price,
@@ -49,17 +63,19 @@ export async function storeProduct(product: Product) {
     recommend: product.recommend,
     image: product.image,
     timestamp: serverTimestamp(),
+    owner: user_id,
   });
+  return id;
 }
 
 export async function checkProductStored(url: string) {
-  const db = firestore;
-  const productsCollection = collection(db, 'products');
+  const productsCollection = collection(firestore, 'items');
   const q = query(productsCollection, where('url', '==', url));
 
   try {
     const querySnapshot = await getDocs(q);
     if (querySnapshot.size > 0) {
+      console.log(querySnapshot.docs[0].data());
       return querySnapshot.docs[0].id;
     }
   } catch (error: any) {
@@ -76,36 +92,8 @@ function generateUniqueId() {
   return uniqueId;
 }
 
-export async function grabRecent() {
-  const products: Product[] = [];
-  const db = firestore;
-  const productsCollection = collection(db, 'products');
-  const q = query(productsCollection, limit(8));
-  const limitedProducts = await getDocs(q);
-
-  if (limitedProducts) {
-    limitedProducts.forEach((product) => {
-      products.push({
-        url: product.data().url,
-        title: product.data().title,
-        current_price: product.data().current_price,
-        highest_price: product.data().highest_price,
-        lowest_price: product.data().lowest_price,
-        average_price: product.data().average_price,
-        rating: product.data().rating,
-        rating_count: product.data().rating_count,
-        amazons_choice: product.data().amazons_choice,
-        recommend: product.data().recommend,
-        image: product.data().image,
-        id: product.id,
-      });
-    });
-    return products;
-  }
-}
-
 export async function getProduct(id: string) {
-  const productsDocRef = doc(firestore, 'products', id);
+  const productsDocRef = doc(firestore, 'items', id);
   const productSnapshot = await getDoc(productsDocRef);
 
   if (productSnapshot.exists()) {
@@ -131,21 +119,12 @@ export async function updateProductWithUserEmail(
   user_email: string,
   product_id: string
 ) {
-  const productDocRef = doc(firestore, 'products', product_id);
-  const productSnapshot = await getDoc(productDocRef);
-  if (productSnapshot.exists()) {
-    await updateDoc(productDocRef, {
-      users_tracking: arrayUnion(user_email),
-    });
-    const userDocRef = doc(firestore, 'users', user_id);
-    await updateDoc(userDocRef, {
-      products_tracking: arrayUnion({
-        ...productSnapshot.data(),
-        id: productSnapshot.id,
-      }),
-    });
+  const itemsDocRef = doc(firestore, 'items', product_id);
+  try {
+    await updateDoc(itemsDocRef, { users_tracking: arrayUnion(user_email) });
     return true;
-  } else {
+  } catch (error) {
+    console.log('Error adding user product tracking', error);
     return false;
   }
 }
@@ -154,23 +133,14 @@ export async function updateProductWithoutUserEmail(
   user_email: string,
   product_id: string
 ) {
-  const productDocRef = doc(firestore, 'products', product_id);
+  console.log(product_id);
+  const productDocRef = doc(firestore, 'items', product_id);
   const productSnapshot = await getDoc(productDocRef);
   if (productSnapshot.exists()) {
     await updateDoc(productDocRef, {
       users_tracking: arrayRemove(user_email),
     });
-    const userDocRef = doc(firestore, 'users', user_id);
-    const userSnapshot = await getDoc(userDocRef);
-    if (userSnapshot.exists()) {
-      const tracking_array = userSnapshot.data().products_tracking;
-      const updated_tracking_array: any = tracking_array.filter(
-        (tracking_item: any) => tracking_item.id !== product_id
-      );
-      await updateDoc(userDocRef, {
-        products_tracking: updated_tracking_array,
-      });
-    }
+
     return true;
   } else {
     return false;
@@ -186,24 +156,31 @@ function truncateTextWithEllipsis(text: string, maxLength: number) {
   }
 }
 
-export async function getUserTracking(user_id: string) {
-  console.log(user_id);
-  const userDocRef = doc(firestore, 'users', user_id);
-  const userSnapshot = await getDoc(userDocRef);
-  if (userSnapshot.exists()) {
-    const temp: any = [];
-    userSnapshot.data().products_tracking?.forEach((product_tracking: any) =>
-      temp.push({
-        title: truncateTextWithEllipsis(product_tracking.title, 30),
-        id: product_tracking.id,
-        current_price: product_tracking.current_price,
-        rating: product_tracking.rating,
-        url: product_tracking.url,
-      })
-    );
-    return temp;
-  } else {
-    return false;
+export async function getUserTracking(user_email: string) {
+  const itemsCollection = collection(firestore, 'items');
+  const q = query(
+    itemsCollection,
+    where('users_tracking', 'array-contains', user_email)
+  );
+  try {
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) return false;
+    const items: any = [];
+    querySnapshot.forEach((doc) => {
+      const itemData = doc.data();
+      items.push({
+        title: truncateTextWithEllipsis(itemData.title, 30),
+        id: doc.id,
+        current_price: itemData.current_price,
+        rating: itemData.rating,
+        url: itemData.url,
+      });
+    });
+    console.log(items);
+    return items;
+  } catch (error) {
+    console.log('Error fetching items: ', error);
+    return;
   }
 }
 
@@ -224,4 +201,87 @@ export async function updateUser(
   } else {
     return false;
   }
+}
+
+export async function updateList(id: string, item_id: string) {
+  const listDocRef = doc(firestore, 'lists', id);
+  try {
+    await updateDoc(listDocRef, {
+      items: arrayUnion(item_id),
+    });
+    return id;
+  } catch (error: any) {
+    console.log(`failed to create new list ${error}`);
+    return null;
+  }
+}
+
+export async function createNewList(
+  name: string,
+  owner: string,
+  items?: string[]
+) {
+  const id = generateUniqueId();
+  const listDocRef = doc(firestore, 'lists', id);
+  try {
+    await setDoc(listDocRef, {
+      name: name,
+      owner: owner,
+      items: items || [],
+      timestamp: serverTimestamp(),
+    });
+    return id;
+  } catch (error: any) {
+    console.log(`failed to create new list ${error}`);
+    return null;
+  }
+}
+
+export async function getLists(owner: string) {
+  const listsCollection = collection(firestore, 'lists');
+  const q = query(listsCollection, where('owner', '==', owner));
+  try {
+    const listsSnapshot = await getDocs(q);
+    if (listsSnapshot.empty) return null;
+
+    const temp: {
+      items: string[];
+      name: string;
+      owner: string;
+      id: string;
+    }[] = [];
+    listsSnapshot.forEach((list) => {
+      temp.push({
+        items: list.data().items,
+        name: list.data().name,
+        owner: list.data().owner,
+        id: list.id,
+      });
+    });
+    console.log(temp);
+    return temp;
+  } catch (error: any) {
+    console.log(`failed to get lists ${error}`);
+  }
+}
+
+export async function getListsItems(list_array: string[]) {
+  if (!list_array) return;
+  const itemData = [];
+  for (const item of list_array) {
+    const itemDocRef = doc(firestore, 'items', item);
+    const itemSnapshot = await getDoc(itemDocRef);
+    if (!itemSnapshot.exists()) return;
+
+    itemData.push({
+      id: item,
+      current_price: itemSnapshot.data().current_price,
+      highest_price: itemSnapshot.data().highest_price,
+      average_price: itemSnapshot.data().average_price,
+      best_price: itemSnapshot.data().lowest_price,
+      name: itemSnapshot.data().title,
+    });
+  }
+  console.log(itemData);
+  return itemData;
 }

@@ -1,19 +1,12 @@
 'use client';
 
 import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Separator } from '@/components/ui/separator';
+import { Dialog } from '@/components/ui/dialog';
 import { useModalStore } from '../states';
 import Auth_Tabs from './auth_tabs';
-import AuthButtons from './authbuttons';
+
 import Track from './track';
+import Add_List from './add_list';
 const Auth_Dialog = () => {
   const { modalType, isOpen, closeModal } = useModalStore();
   return (
@@ -29,6 +22,13 @@ const Auth_Dialog = () => {
         {modalType === 'track' ? (
           <>
             <Track />
+          </>
+        ) : (
+          ''
+        )}
+        {modalType === 'add_list' ? (
+          <>
+            <Add_List />
           </>
         ) : (
           ''
