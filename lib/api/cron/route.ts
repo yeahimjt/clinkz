@@ -9,6 +9,7 @@ import { generateEmailBody, sendEmail } from '@/lib/nodemailer';
 
 import { scrapeAmazonProduct } from '@/lib/scraper';
 import { collection, doc, getDocs, updateDoc } from 'firebase/firestore';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
@@ -83,6 +84,10 @@ export async function GET() {
         return updatedProduct;
       })
     );
+    return NextResponse.json({
+      message: 'Ok',
+      data: updatedProducts,
+    });
   } catch (error) {
     throw new Error(`ERROR IN GET: ${error}`);
   }
