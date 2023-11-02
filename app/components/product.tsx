@@ -10,9 +10,17 @@ import Highest from '@/public/icons/highest.svg';
 import Track from '@/public/icons/track.svg';
 import Redirect from '@/public/icons/redirect.svg';
 import Add_List from '@/public/icons/add_list.svg';
-import { AlignVerticalSpaceAround, Flame, TrendingUp } from 'lucide-react';
+import {
+  AlignVerticalSpaceAround,
+  Flame,
+  FlipVertical2,
+  Tag,
+  TrendingUp,
+} from 'lucide-react';
 import { ThumbsUp } from 'lucide-react';
 import { ArrowDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 interface ProductProps {
   id: string;
 }
@@ -28,80 +36,90 @@ const Product = ({ id }: ProductProps) => {
     handleDataGrab();
   }, []);
   return (
-    <section className='my-12 flex h-[429px] flex-col gap-[20px]  p-4  md:flex-row'>
-      <div className='relative flex-[0.5]'>
-        {product?.image && (
-          <Image src={product?.image} width={568} height={385} alt='' />
-        )}
-      </div>
-      <div className='flex-[0.5]'>
-        <div className='flex h-full flex-col'>
-          <div className='flex-[0.3]'>
-            <h1 className='font-bold'>{product?.title}</h1>
-            <div className='my-2  flex gap-[10px]'>
-              <div className='flex items-center gap-[5px]'>
-                <Image
-                  src='/icons/star.png'
-                  width={25}
-                  height={25}
-                  alt='rating icon'
-                />
-                <h3>{product?.rating}</h3>
+    <>
+      <section className='my-12 flex h-fit flex-col gap-[20px]  p-4  md:flex-row'>
+        <div className='relative flex-[0.5]'>
+          {product?.image && (
+            <Image
+              className='object-scale-down'
+              src={product?.image}
+              width={568}
+              height={385}
+              alt=''
+            />
+          )}
+        </div>
+        <div className='flex-[0.5]'>
+          <div className='flex h-full flex-col'>
+            <div className='flex-[0.3]'>
+              <h1 className='text-[25px] font-bold'>{product?.title}</h1>
+              <div className='flex justify-between'>
+                <div className='my-2  flex items-end gap-[20px]'>
+                  <div className='flex items-center gap-[5px]'>
+                    <Image
+                      src='/icons/star.png'
+                      width={40}
+                      height={40}
+                      alt='rating icon'
+                    />
+                    <h3 className='text-[25px]'>{product?.rating}</h3>
+                  </div>
+                  <h2 className='text-[18px] font-light'>
+                    {product?.rating_count} reviews
+                  </h2>
+                </div>
+                <div className='flex items-center justify-end gap-[10px]'>
+                  <ThumbsUp className='h-[25px] w-[25px]' />
+                  <h2 className='font-extralight'>
+                    <span className='font-bold text-green-400'>
+                      {product?.recommend}
+                    </span>{' '}
+                    people recommend this product
+                  </h2>
+                </div>
               </div>
-              <h2>{product?.rating_count} reviews</h2>
+              <h1 className='my-2 text-gray-800 underline'>Visit Product</h1>
             </div>
-            <div className=' z-20 flex items-center gap-[10px]'>
-              <button className='h-[40px] w-[40px] rounded-[5px] border border-my-gray p-2'>
-                <Image
-                  className='mx-auto'
-                  src={Track}
-                  width={30}
-                  height={30}
-                  alt='track icon'
-                />
-              </button>
-              <button className='h-[40px] w-[40px] rounded-[5px] border border-my-gray p-2'>
-                <Image
-                  className='mx-auto'
-                  src={Redirect}
-                  width={30}
-                  height={30}
-                  alt='go to icon'
-                />
-              </button>
-              <button className='h-[40px] w-[40px] rounded-[5px] border border-my-gray p-2'>
-                <Image
-                  className='mx-auto'
-                  src={Add_List}
-                  width={30}
-                  height={30}
-                  alt='add to list icon'
-                />
-              </button>
+            <Separator className='my-12' />
+            <div className='flex h-full flex-[0.7] items-end justify-end'>
+              <div className='grid flex-[1]  grid-cols-2 items-end justify-end gap-[10px] text-[20px]'>
+                <div className='flex items-center justify-center gap-[15px] border border-my-gray/10 bg-my-blue/10 p-2 '>
+                  <Flame className='h-[40px] w-[40px] text-orange-500' />$
+                  {product?.lowest_price}
+                </div>
+                <div className='flex items-center justify-center gap-[15px] border border-my-gray/10 bg-my-blue/10 p-2 '>
+                  <Tag className='h-[40px] w-[40px] text-green-500' />$
+                  {product?.current_price}
+                </div>
+                <div className='flex items-center justify-center gap-[15px] border border-my-gray/10 bg-my-blue/10 p-2 '>
+                  <TrendingUp className='h-[40px] w-[40px] text-red-500' />$
+                  {product?.highest_price}
+                </div>
+                <div className='flex items-center justify-center gap-[15px] border border-my-gray/10 bg-my-blue/10 p-2 '>
+                  <FlipVertical2 className='h-[40px] w-[40px] text-my-blue' />$
+                  {product?.average_price}
+                </div>
+              </div>
             </div>
-          </div>
-          <div className='flex flex-[0.7] items-end justify-end'>
-            <div className='grid flex-[1]  grid-cols-2 items-end justify-end gap-[10px]'>
-              <div className='flex items-center justify-center gap-[5px] border border-my-gray/10 bg-my-blue/10 '>
-                <Flame className='h-[40px] w-[40px]' />${product?.lowest_price}
-              </div>
-              <div className='flex items-center justify-center gap-[5px] border border-my-gray/10 bg-my-blue/10 '>
-                <ArrowDown className='h-[40px] w-[40px]' />$
-                {product?.current_price}
-              </div>
-              <div className='flex items-center justify-center gap-[5px] border border-my-gray/10 bg-my-blue/10 '>
-                <TrendingUp className='h-[40px] w-[40px] ' />$
-                {product?.highest_price}
-              </div>
-              <div className='flex items-center justify-center gap-[5px] border border-my-gray/10 bg-my-blue/10 '>
-                <AlignVerticalSpaceAround className='h-[40px] w-[40px]' />$
-                {product?.average_price}
-              </div>
+            <Separator className='my-12' />
+            <div className='mt-6 flex gap-[20px]'>
+              <Button className=' flex-[0.8] border bg-my-blue hover:border-my-blue hover:bg-white hover:text-black'>
+                Track Product
+              </Button>
+              <Button className='flex-[0.2] border border-my-blue bg-white text-black hover:bg-my-blue hover:text-white'>
+                Add To List
+              </Button>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+      {/* <h1 className='text-[20px] font-medium'>Product Description</h1>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus
+        ad ut, recusandae nihil cum harum quidem nobis ullam quis rem quisquam,
+        incidunt doloribus voluptatem aperiam labore nemo nisi quos quasi.
+      </p> */}
+    </>
   );
 };
 

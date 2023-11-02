@@ -1,4 +1,4 @@
-import { Product, Subscription } from '@/app/constants';
+import { PriceHistoryItem, Product, Subscription } from '@/app/constants';
 import { firestore } from '@/app/firebase';
 import {
   collection,
@@ -8,6 +8,13 @@ import {
   query,
   where,
 } from 'firebase/firestore';
+
+const Notification = {
+  WELCOME: 'WELCOME',
+  CHANGE_OF_STOCK: 'CHANGE_OF_STOCK',
+  LOWEST_PRICE: 'LOWEST_PRICE',
+  THRESHOLD_MET: 'THRESHOLD_MET',
+};
 
 export async function grabRecent() {
   try {
@@ -33,6 +40,8 @@ export async function grabRecent() {
           recommend: product.data().recommend,
           image: product.data().image,
           id: product.id,
+          price_history: product.data().price_history,
+          category: product.data().category,
         });
         console.log(products);
       });
@@ -46,6 +55,37 @@ export async function grabRecent() {
     console.error('Error fetching recent products:', error);
     return null;
   }
+}
+
+export function getHighestPrice(priceList: PriceHistoryItem[]) {
+  let highestPrice = priceList[0];
+
+  for (let i = 0; i < priceList.length; i++) {
+    if (priceList[i].price > highestPrice.price) {
+      highestPrice = priceList[i];
+    }
+  }
+
+  return highestPrice.price;
+}
+
+export function getLowestPrice(priceList: PriceHistoryItem[]) {
+  let lowestPrice = priceList[0];
+
+  for (let i = 0; i < priceList.length; i++) {
+    if (priceList[i].price < lowestPrice.price) {
+      lowestPrice = priceList[i];
+    }
+  }
+
+  return lowestPrice.price;
+}
+
+export function getAveragePrice(priceList: PriceHistoryItem[]) {
+  const sumOfPrices = priceList.reduce((acc, curr) => acc + curr.price, 0);
+  const averagePrice = sumOfPrices / priceList.length || 0;
+
+  return averagePrice;
 }
 
 export async function checkMonthlyLinks(user_id: string) {
@@ -105,3 +145,16 @@ export async function getListCount(user_email: string) {
     throw error;
   }
 }
+
+export const getEmailNotifType = (
+  scrapedProduct: Product,
+  currentProduct: Product
+) => {
+  const lowestPrice = getLowestPrice(currentProduct.price_history);
+
+  if (scrapedProduct.current_price < lowestPrice) {
+    return Notification.LOWEST_PRICE as keyof typeof Notification;
+  }
+
+  return null;
+};

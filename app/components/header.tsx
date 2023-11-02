@@ -15,7 +15,8 @@ const Header = () => {
   const [searchURL, setSearchURL] = useState<string>('');
   const [hoveringSubmit, setHoveringSubmit] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { modalType, isOpen, openModal, closeModal } = useModalStore();
+  const { modalType, setModalType, isOpen, openModal, closeModal } =
+    useModalStore();
   const router = useRouter();
   const subscription = useSubscriptionStore((store) => store.subscription);
   useEffect(() => {
@@ -46,6 +47,7 @@ const Header = () => {
     return false;
   };
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    console.log('i got called');
     e.preventDefault();
     const isValidLink = checkValidURL(searchURL);
     if (!isValidLink) {
@@ -55,9 +57,14 @@ const Header = () => {
       });
       return;
     }
+    console.log('im valid');
+
     if (!user) {
+      setModalType('auth');
       openModal();
     } else {
+      console.log('im user');
+
       const monthlyLinks = await checkMonthlyLinks(user.uid);
       const monthlyLimit = subscription ? 20 : 5;
       if (!(monthlyLinks < monthlyLimit)) {
@@ -96,8 +103,8 @@ const Header = () => {
         <section className='flex flex-[0.5] flex-col justify-center gap-[20px]  lg:justify-start'>
           {/* <button className='w-fit text-my-blue'>Get Started -&gt;</button> */}
           <h1 className='text-[41px] text-my-black'>
-            <span className='text-my-blue'>Boost</span> Your Shopping Experience
-            with Clinkz
+            <span className='font-bold text-my-blue'>Boost</span> Your Shopping
+            Experience with Clinkz
           </h1>
           <h2 className='text-my-gray'>
             Easily categorize your wishlist, discover the best prices, and share

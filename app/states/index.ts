@@ -9,6 +9,8 @@ interface ModalStore {
   isOpen: boolean;
   openModal: () => void;
   closeModal: () => void;
+  refresh: boolean;
+  setRefresh: (value: boolean) => void;
 }
 
 export const useModalStore = create<ModalStore>((set) => ({
@@ -19,6 +21,8 @@ export const useModalStore = create<ModalStore>((set) => ({
   isOpen: false,
   openModal: () => set({ isOpen: true }),
   closeModal: () => set({ isOpen: false }),
+  refresh: false,
+  setRefresh: (value: boolean) => set({ refresh: value }),
 }));
 
 interface SubscriptionState {

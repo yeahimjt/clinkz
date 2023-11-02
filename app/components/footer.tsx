@@ -76,7 +76,7 @@ const Footer = () => {
       <div>
         <Separator />
         <div className='mt-4 flex justify-between'>
-          <p>2023 &c; Clinkz</p>
+          <p>2023 &copy; Clinkz</p>
           <p>Designed & Developed By Jonathan Trevino</p>
         </div>
       </div>

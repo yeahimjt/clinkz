@@ -13,13 +13,13 @@ interface ProductProps {
 const Product_Card = ({ product }: ProductProps) => {
   const { setModalType, openModal } = useModalStore();
   return (
-    <div className='  transiiton-all rounded-[10px]   border border-my-light-gray/70 p-2 shadow-md hover:scale-[1.01] hover:shadow-lg sm:w-[254px]'>
+    <div className='  transiiton-all rounded-[10px]  p-2  hover:scale-[1.01] hover:shadow-lg sm:w-[254px]'>
       <Link href={`/product/${product.id}`}>
         <div className=''>
           <div className='relative h-[180px]'>
             {product.image && (
               <Image
-                className='mx-auto object-cover'
+                className='mx-auto object-scale-down'
                 src={product.image}
                 fill
                 alt={product.title + ` image`}

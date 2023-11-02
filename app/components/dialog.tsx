@@ -7,12 +7,15 @@ import Auth_Tabs from './auth_tabs';
 
 import Track from './track';
 import Add_List from './add_list';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../firebase';
 const Auth_Dialog = () => {
   const { modalType, isOpen, closeModal } = useModalStore();
+  const [user, isLoading] = useAuthState(auth);
   return (
     <div className='z-50 bg-white'>
       <Dialog open={isOpen} onOpenChange={closeModal}>
-        {modalType === 'auth' ? (
+        {modalType === 'auth' && !user && !isLoading ? (
           <>
             <Auth_Tabs />
           </>

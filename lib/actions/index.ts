@@ -5,30 +5,33 @@ import {
   arrayUnion,
   collection,
   doc,
+  endAt,
   getDoc,
   getDocs,
   limit,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
+  startAt,
   updateDoc,
   where,
 } from 'firebase/firestore';
 import { scrapeAmazonProduct } from '../scraper';
 import { app, firestore } from '@/app/firebase';
 
-import { Product } from '@/app/constants';
+import { PriceHistoryItem, Product } from '@/app/constants';
 
 export async function handleScrapeAndStore(url: string, user_id: string) {
   // No URL passed
   if (!url) return false;
-
+  console.log('in here scrape and store');
   // Check if this specific amazon product link has already been stored to prevent repetitive scraping
   const productStoredId = await checkProductStored(url);
 
   // Product has already been stored, return true
   if (productStoredId) {
-    return true;
+    return productStoredId;
   } else {
     // Scrape the amazon product link
     const productData = await scrapeAmazonProduct(url);
@@ -64,6 +67,8 @@ export async function storeProduct(product: Product, user_id: string) {
     image: product.image,
     timestamp: serverTimestamp(),
     owner: user_id,
+    price_history: product.price_history,
+    category: product.category,
   });
   return id;
 }
@@ -110,6 +115,8 @@ export async function getProduct(id: string) {
       recommend: productSnapshot.data().recommend,
       image: productSnapshot.data().image,
       id: productSnapshot.id,
+      price_history: productSnapshot.data().price_history,
+      category: productSnapshot.data().category,
     };
   }
 }
@@ -285,3 +292,77 @@ export async function getListsItems(list_array: string[]) {
   console.log(itemData);
   return itemData;
 }
+
+export async function grabAllItems() {
+  const itemsCollection = collection(firestore, 'items');
+  const products: Product[] = [];
+  try {
+    const itemsDocSnapshot = await getDocs(itemsCollection);
+    if (!itemsDocSnapshot.empty) {
+      itemsDocSnapshot.forEach((product) => {
+        products.push({
+          url: product.data().url,
+          title: product.data().title,
+          current_price: product.data().current_price,
+          highest_price: product.data().highest_price,
+          lowest_price: product.data().lowest_price,
+          average_price: product.data().average_price,
+          rating: product.data().rating,
+          rating_count: product.data().rating_count,
+          amazons_choice: product.data().amazons_choice,
+          recommend: product.data().recommend,
+          image: product.data().image,
+          id: product.id,
+          price_history: product.data().price_history,
+          category: product.data().category,
+        });
+      });
+    }
+    return products;
+  } catch (error) {
+    console.log(`failed to get all items ${error}`);
+    return null;
+  }
+}
+
+export async function searchForItems(queryString: string) {
+  const products: Product[] = [];
+  if (queryString === '') return null;
+  const itemsCollection = collection(firestore, 'items');
+  const q = query(
+    itemsCollection,
+    orderBy('title'),
+    startAt(queryString),
+    endAt(queryString + '\uf8ff')
+  );
+  try {
+    const itemsSnapshot = await getDocs(q);
+    if (!itemsSnapshot.empty) {
+      itemsSnapshot.forEach((product) => {
+        products.push({
+          url: product.data().url,
+          title: product.data().title,
+          current_price: product.data().current_price,
+          highest_price: product.data().highest_price,
+          lowest_price: product.data().lowest_price,
+          average_price: product.data().average_price,
+          rating: product.data().rating,
+          rating_count: product.data().rating_count,
+          amazons_choice: product.data().amazons_choice,
+          recommend: product.data().recommend,
+          image: product.data().image,
+          id: product.id,
+          price_history: product.data().price_history,
+          category: product.data().category,
+        });
+      });
+
+      return products;
+    }
+  } catch (error) {
+    console.log(`failed to get items with query ${queryString} ${error}`);
+    return null;
+  }
+}
+
+export async function updateProduct(product: Product) {}

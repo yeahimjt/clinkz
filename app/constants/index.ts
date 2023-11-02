@@ -4,6 +4,7 @@ export interface Product {
   url: string;
   title: string;
   current_price: number;
+  price_history: PriceHistoryItem[];
   highest_price: number;
   lowest_price: number;
   average_price: number;
@@ -13,6 +14,8 @@ export interface Product {
   recommend: string;
   image: string | undefined;
   id: string | undefined;
+  category: string;
+  users_tracking?: string[];
 }
 export interface ProductTable {
   title: string;
@@ -21,6 +24,10 @@ export interface ProductTable {
   rating: string;
   url: string;
 }
+
+export type PriceHistoryItem = {
+  price: number;
+};
 
 export const FIREBASE_ERRORS: { [key: string]: string } = {
   'auth/email-already-in-use': 'Email Address is already in use.',
@@ -63,3 +70,19 @@ export interface Subscription {
   trial_start: Timestamp | null;
   trial_end: Timestamp | null;
 }
+
+export type NotificationType =
+  | 'WELCOME'
+  | 'CHANGE_OF_STOCK'
+  | 'LOWEST_PRICE'
+  | 'THRESHOLD_MET';
+
+export type EmailContent = {
+  subject: string;
+  body: string;
+};
+
+export type EmailProductInfo = {
+  title: string;
+  url: string;
+};

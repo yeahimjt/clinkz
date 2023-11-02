@@ -122,7 +122,7 @@ const Profile = () => {
       waitForTrackingData();
       setTriggerUpdate(false);
     }
-    if (user === null && userChecked) {
+    if (user === null && !loading) {
       redirect('/');
     }
   }, [user, triggerUpdate]);
