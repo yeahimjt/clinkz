@@ -83,7 +83,7 @@ export async function GET() {
           );
           // Send email notification
           await sendEmail(emailContent, userEmails);
-          await delay(2000);
+          await delay(5000);
         }
 
         return updatedProduct;
