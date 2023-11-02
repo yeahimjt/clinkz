@@ -11,7 +11,6 @@ import { scrapeAmazonProduct } from '@/lib/scraper';
 import { collection, doc, getDocs, updateDoc } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
 
-export const maxDuration = 10;
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
