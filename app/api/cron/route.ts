@@ -13,6 +13,7 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+const delay = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function GET() {
   try {
@@ -82,6 +83,7 @@ export async function GET() {
           );
           // Send email notification
           await sendEmail(emailContent, userEmails);
+          await delay(2000);
         }
 
         return updatedProduct;
