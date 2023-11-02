@@ -45,6 +45,7 @@ export async function scrapeAmazonProduct(url: string) {
       .split('r')[1];
     const image = $('img.a-dynamic-image').attr('src');
     const category = $('.a-list-item a').first().text();
+    console.log('made it to end');
     return {
       url: String(url),
       title,
@@ -63,6 +64,8 @@ export async function scrapeAmazonProduct(url: string) {
       users_tracking: [],
     };
   } catch (error: any) {
-    console.log(`Failed to scrape product ${error.message}`);
+    console.log(
+      `Failed to scrape product inside of amazon scrape ${error.message}`
+    );
   }
 }

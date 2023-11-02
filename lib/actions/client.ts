@@ -58,6 +58,7 @@ export async function grabRecent() {
 }
 
 export function getHighestPrice(priceList: PriceHistoryItem[]) {
+  console.log(priceList);
   let highestPrice = priceList[0];
 
   for (let i = 0; i < priceList.length; i++) {
@@ -70,6 +71,8 @@ export function getHighestPrice(priceList: PriceHistoryItem[]) {
 }
 
 export function getLowestPrice(priceList: PriceHistoryItem[]) {
+  console.log(priceList);
+
   let lowestPrice = priceList[0];
 
   for (let i = 0; i < priceList.length; i++) {
@@ -82,6 +85,8 @@ export function getLowestPrice(priceList: PriceHistoryItem[]) {
 }
 
 export function getAveragePrice(priceList: PriceHistoryItem[]) {
+  console.log(priceList);
+
   const sumOfPrices = priceList.reduce((acc, curr) => acc + curr.price, 0);
   const averagePrice = sumOfPrices / priceList.length || 0;
 
@@ -151,7 +156,7 @@ export const getEmailNotifType = (
   currentProduct: Product
 ) => {
   const lowestPrice = getLowestPrice(currentProduct.price_history);
-
+  console.log(' in here');
   if (scrapedProduct.current_price < lowestPrice) {
     return Notification.LOWEST_PRICE as keyof typeof Notification;
   }

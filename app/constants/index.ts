@@ -13,7 +13,7 @@ export interface Product {
   amazons_choice: boolean;
   recommend: string;
   image: string | undefined;
-  id: string | undefined;
+  id?: string | undefined | null;
   category: string;
   users_tracking?: string[];
 }
