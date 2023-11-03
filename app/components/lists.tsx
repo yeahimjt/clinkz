@@ -30,7 +30,7 @@ const Lists = () => {
     | { items: string[]; name: string; owner: string; id: string }[]
     | null
     | undefined
-  >(null);
+  >(undefined);
   function roundToTwoDecimalPlaces(number: number) {
     return '$' + Math.round(number * 100) / 100;
   }
@@ -43,9 +43,13 @@ const Lists = () => {
   useEffect(() => {
     async function handleListGrab() {
       if (!user && !refresh) return;
-      const lists = await getLists(user!.email!);
-      if (lists === null) return;
-      setLists(lists);
+      const tempLists = await getLists(user!.email!);
+      console.log(tempLists);
+      if (tempLists === null) {
+        setLists(null);
+        return;
+      }
+      setLists(tempLists);
       setRefresh(false);
     }
 
@@ -82,16 +86,48 @@ const Lists = () => {
     // setProcessedData(processedResults);
   };
 
-  console.log(parsedItems);
+  console.log(lists);
   const handleModalOpen = () => {
     setModalType('new_list');
     openModal();
   };
-  if (lists === null) {
-    return <p className='min-h-[70vh]'>Loading...</p>;
+  if (lists === undefined) {
+    return (
+      <div className='my-12'>
+        <div className='mb-8 flex justify-between'>
+          <h1 className='text-[28px] font-bold text-my-black'>My Lists</h1>
+          <span className='flex gap-[20px]'>
+            <Button
+              className='flex items-center gap-[10px] border bg-my-blue text-[18px] text-white  hover:bg-white hover:text-black'
+              onClick={() => handleModalOpen()}
+            >
+              New List
+              <Plus className='aspect-square w-[15px]' />
+            </Button>
+          </span>
+        </div>
+        <p className='min-h-[70vh]'>Loading...</p>;
+      </div>
+    );
   }
-  if (lists && lists.length === 0) {
-    return <p>No lists found.</p>;
+  if (lists === null) {
+    return (
+      <div className='my-12'>
+        <div className='mb-8 flex justify-between'>
+          <h1 className='text-[28px] font-bold text-my-black'>My Lists</h1>
+          <span className='flex gap-[20px]'>
+            <Button
+              className='flex items-center gap-[10px] border bg-my-blue text-[18px] text-white  hover:bg-white hover:text-black'
+              onClick={() => handleModalOpen()}
+            >
+              New List
+              <Plus className='aspect-square w-[15px]' />
+            </Button>
+          </span>
+        </div>
+        <p className='min-h-[70vh]'>No lists found.</p>;
+      </div>
+    );
   }
   const handleAddItem = (productID: string) => {
     setProductID(productID);

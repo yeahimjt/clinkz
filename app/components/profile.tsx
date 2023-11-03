@@ -84,7 +84,16 @@ const Profile = () => {
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem className='cursor-pointer'>
                 <a href={product.url} target='_blank' rel='noreferrer'>
-                  Go to product page
+                  Go to amazon product page
+                </a>
+              </DropdownMenuItem>
+              <DropdownMenuItem className='cursor-pointer'>
+                <a
+                  href={`/product/${product.id}`}
+                  target='_blank'
+                  rel='noreferrer'
+                >
+                  Go to Clinkz product page
                 </a>
               </DropdownMenuItem>
               <DropdownMenuItem

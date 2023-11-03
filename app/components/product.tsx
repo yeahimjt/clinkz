@@ -21,11 +21,13 @@ import { ThumbsUp } from 'lucide-react';
 import { ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useModalStore } from '../states';
 interface ProductProps {
   id: string;
 }
 const Product = ({ id }: ProductProps) => {
   const [product, setProduct] = useState<Product | null>(null);
+  const { setModalType, openModal, setProductID } = useModalStore();
   useEffect(() => {
     async function handleDataGrab() {
       let returned = await getProduct(id);
@@ -35,6 +37,17 @@ const Product = ({ id }: ProductProps) => {
     }
     handleDataGrab();
   }, []);
+  const handleTrack = () => {
+    setModalType('track');
+    setProductID(id);
+    openModal();
+  };
+
+  const handleAddToList = () => {
+    setModalType('add_list');
+    setProductID(id);
+    openModal();
+  };
   return (
     <>
       <section className='my-12 flex h-fit flex-col gap-[20px]  p-4  md:flex-row'>
@@ -103,10 +116,16 @@ const Product = ({ id }: ProductProps) => {
             </div>
             <Separator className='my-12' />
             <div className='mt-6 flex gap-[20px]'>
-              <Button className=' flex-[0.8] border bg-my-blue hover:border-my-blue hover:bg-white hover:text-black'>
+              <Button
+                className=' flex-[0.8] border bg-my-blue hover:border-my-blue hover:bg-white hover:text-black'
+                onClick={handleTrack}
+              >
                 Track Product
               </Button>
-              <Button className='flex-[0.2] border border-my-blue bg-white text-black hover:bg-my-blue hover:text-white'>
+              <Button
+                className='flex-[0.2] border border-my-blue bg-white text-black hover:bg-my-blue hover:text-white'
+                onClick={handleAddToList}
+              >
                 Add To List
               </Button>
             </div>
