@@ -167,12 +167,12 @@ const Profile = () => {
       <div className='flex'>
         <span className='flex flex-[0.2] flex-col gap-[20px] text-my-black'>
           <h2>Email</h2>
-          <h2>Name</h2>
+          {user?.displayName && <h2>Name</h2>}
           <h2>Subscription</h2>
         </span>
         <span className='relative flex flex-[0.8] flex-col gap-[20px] text-my-gray'>
           <h2>{user?.email}</h2>
-          <h2>{user?.displayName}</h2>
+          {user?.displayName && <h2>{user.displayName}</h2>}
           <div className='relative'>
             <div className='absolute'>
               <HoverCard>

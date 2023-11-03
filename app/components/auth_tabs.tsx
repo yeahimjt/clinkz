@@ -48,31 +48,31 @@ const Auth_Tabs = () => {
     }
   };
 
-  // useEffect(() => {
-  //   // User will be logged in with email and password, update local user profile and firestore database profile
-  //   if (user) {
-  //     // Update locally
-  //     updateProfile(user.user, {
-  //       displayName: formData.name,
-  //     });
+  useEffect(() => {
+    // User will be logged in with email and password, update local user profile and firestore database profile
+    if (user) {
+      // Update locally
+      updateProfile(user.user, {
+        displayName: formData.name,
+      });
 
-  //     // Update to firestore database
-  //     const userDoc = doc(firestore, 'users', user.user.uid);
+      // Update to firestore database
+      const userDoc = doc(firestore, 'users', user.user.uid);
 
-  //     const dataToUpdate = {
-  //       displayName: formData.name,
-  //       email: user.user.email,
-  //       uid: user.user.uid,
-  //       refreshToken: user.user.refreshToken,
-  //       emailVerified: user.user.emailVerified,
-  //     };
+      const dataToUpdate = {
+        displayName: formData.name,
+        email: user.user.email,
+        uid: user.user.uid,
+        refreshToken: user.user.refreshToken,
+        emailVerified: user.user.emailVerified,
+      };
 
-  //     const uploadUser = setDoc(userDoc, dataToUpdate, { merge: true });
+      const uploadUser = setDoc(userDoc, dataToUpdate, { merge: true });
 
-  //     // If no errors raised, close modal for seamless UI experience to continue on actions that initiated log-in/sign-in request
-  //     closeModal();
-  //   }
-  // }, [user]);
+      // If no errors raised, close modal for seamless UI experience to continue on actions that initiated log-in/sign-in request
+      closeModal();
+    }
+  }, [user]);
 
   const [signInWithEmailAndPassword, userLogin, loadingLogin, errorLogin] =
     useSignInWithEmailAndPassword(auth);
