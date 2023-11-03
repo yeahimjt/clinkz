@@ -110,7 +110,7 @@ const Product = ({ id }: ProductProps) => {
                 </div>
                 <div className='flex items-center justify-center gap-[15px] border border-my-gray/10 bg-my-blue/10 p-2 '>
                   <FlipVertical2 className='h-[40px] w-[40px] text-my-blue' />$
-                  {product?.average_price}
+                  {Math.round(product?.average_price!)}
                 </div>
               </div>
             </div>
