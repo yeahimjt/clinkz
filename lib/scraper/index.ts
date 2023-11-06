@@ -9,23 +9,21 @@ export async function scrapeAmazonProduct(url: string) {
 
   const apiKey = String(process.env.SCRAPERAPI_API_KEY);
   try {
-    // Set up the ScrapingBee API request
-    const scrapingBeeUrl = `http://api.scraperapi.com?api_key=${apiKey}&url=${encodeURIComponent(
-      url
-    )}`;
+    const username = String(process.env.BRIGHT_DATA_USERNAME);
+    const password = String(process.env.BRIGHT_DATA_PASSWORD);
+    const port = 22225;
+    const session_id = (1000000 * Math.random()) | 0;
 
-    const response = await axios.get(url, {
-      method: 'GET',
-      proxy: {
-        host: 'proxy-server.scraperapi.com',
-        port: 8001,
-        auth: {
-          username: 'scraperapi',
-          password: apiKey,
-        },
-        protocol: 'http',
+    const options = {
+      auth: {
+        username: `${username}-session-${session_id}`,
+        password,
       },
-    });
+      host: 'brd.superproxy.io',
+      port,
+      rejectUnauthorized: false,
+    };
+    const response = await axios.get(url, options);
     if (response.status !== 200) {
       console.log(`Failed to scrape product - HTTP Status: ${response}`);
       return null;
