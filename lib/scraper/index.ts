@@ -14,8 +14,18 @@ export async function scrapeAmazonProduct(url: string) {
       url
     )}`;
 
-    const response = await axios.get(scrapingBeeUrl);
-
+    const response = await axios.get(url, {
+      method: 'GET',
+      proxy: {
+        host: 'proxy-server.scraperapi.com',
+        port: 8001,
+        auth: {
+          username: 'scraperapi',
+          password: apiKey,
+        },
+        protocol: 'http',
+      },
+    });
     if (response.status !== 200) {
       console.log(`Failed to scrape product - HTTP Status: ${response}`);
       return null;
