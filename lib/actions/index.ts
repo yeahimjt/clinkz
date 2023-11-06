@@ -25,7 +25,6 @@ import { PriceHistoryItem, Product } from '@/app/constants';
 export async function handleScrapeAndStore(url: string, user_id: string) {
   // No URL passed
   if (!url) return false;
-  console.log('in here scrape and store');
   // Check if this specific amazon product link has already been stored to prevent repetitive scraping
   const productStoredId = await checkProductStored(url);
 
@@ -35,14 +34,13 @@ export async function handleScrapeAndStore(url: string, user_id: string) {
   } else {
     // Scrape the amazon product link
     const productData = await scrapeAmazonProduct(url);
-    console.log('productData before check', productData);
 
     // Scrape unsuccessful (amazon prevented it, brightdata has not switched ip)
     if (productData == null) return false;
 
     // Scrape successful, now store the scraped data in the database for future use
     const productIdStored = await storeProduct(productData, user_id);
-    console.log('returning true');
+
     if (productIdStored) {
       return productIdStored;
     }

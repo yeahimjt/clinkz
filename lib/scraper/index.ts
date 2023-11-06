@@ -7,7 +7,7 @@ import { formatPrice } from '../utils';
 export async function scrapeAmazonProduct(url: string) {
   if (!url) return;
 
-  const apiKey = String(process.env.SCRAPERAPI_API_KEY); // Replace with your ScrapingBee API key
+  const apiKey = String(process.env.SCRAPERAPI_API_KEY);
   try {
     // Set up the ScrapingBee API request
     const scrapingBeeUrl = `http://api.scraperapi.com?api_key=${apiKey}&url=${encodeURIComponent(
