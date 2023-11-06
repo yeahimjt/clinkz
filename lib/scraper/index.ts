@@ -17,7 +17,7 @@ export async function scrapeAmazonProduct(url: string) {
     const response = await axios.get(scrapingBeeUrl);
 
     if (response.status !== 200) {
-      console.log(`Failed to scrape product - HTTP Status: ${response.status}`);
+      console.log(`Failed to scrape product - HTTP Status: ${response}`);
       return null;
     }
 
