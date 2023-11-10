@@ -10,9 +10,9 @@ export async function scrapeAmazonProduct(url: string) {
   const apiKey = String(process.env.SCRAPERAPI_API_KEY);
   try {
     // Set up the ScrapingBee API request
-    const scrapingBeeUrl = `http://api.scraperapi.com?api_key=${apiKey}&url=${url}`;
+    const apiUrl = `http://api.scraperapi.com?api_key=${apiKey}&url=${url}`;
 
-    const response = await axios.get(scrapingBeeUrl);
+    const response = await axios.get(apiUrl);
 
     if (response.status !== 200) {
       console.log(`Failed to scrape product - HTTP Status: ${response.status}`);

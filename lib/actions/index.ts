@@ -8,7 +8,6 @@ import {
   endAt,
   getDoc,
   getDocs,
-  limit,
   orderBy,
   query,
   serverTimestamp,
@@ -18,9 +17,9 @@ import {
   where,
 } from 'firebase/firestore';
 import { scrapeAmazonProduct } from '../scraper';
-import { app, firestore } from '@/app/firebase';
+import { firestore } from '@/app/firebase';
 
-import { PriceHistoryItem, Product } from '@/app/constants';
+import { Product } from '@/app/constants';
 
 export async function handleScrapeAndStore(url: string, user_id: string) {
   // No URL passed
