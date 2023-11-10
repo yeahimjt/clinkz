@@ -30,7 +30,6 @@ const Add_List = () => {
   const [user] = useAuthState(auth);
   useEffect(() => {
     async function handleListGrab() {
-      console.log(user);
       if (!user) return;
       const lists = await getLists(user.email!);
       if (lists === null) return;
@@ -40,13 +39,11 @@ const Add_List = () => {
       handleListGrab();
     }
   }, [isOpen]);
-  console.log(lists);
   const handleAddList = async () => {
     if (!user || !productID) return;
     const userListCount = await getListCount(user.email!);
 
     // People with upgraded subscription have unlimited list access, others have a limit of
-    console.log(newName);
     if (subscription ? false : newName !== '' && userListCount < 5) {
       toast({
         title: 'Limit Reached',

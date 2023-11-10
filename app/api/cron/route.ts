@@ -39,7 +39,6 @@ export async function GET() {
           ...currentProduct.data().price_history,
           { price: scrapedProduct.current_price },
         ];
-        console.log(updatedPriceHistory);
         const product = {
           ...scrapedProduct,
           price_history: updatedPriceHistory,
@@ -48,7 +47,6 @@ export async function GET() {
           average_price: getAveragePrice(updatedPriceHistory),
           id: currentProduct.id,
         };
-        console.log(product);
         const beforeProduct = {
           url: currentProduct.data().url,
           title: currentProduct.data().title,
@@ -65,14 +63,11 @@ export async function GET() {
           price_history: updatedPriceHistory,
           category: currentProduct.data().category,
         };
-        console.log('before product', beforeProduct);
         const emailNotifType = getEmailNotifType(scrapedProduct, beforeProduct);
-        console.log('email type is ', emailNotifType);
+
         const id = currentProduct.id;
-        console.log('after id assign');
+
         if (!id) return;
-        console.log('after id');
-        console.log(id);
         const productDocRef = doc(firestore, 'items', id);
         const updatedProduct = await updateDoc(productDocRef, product);
 
