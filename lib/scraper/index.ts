@@ -13,7 +13,14 @@ export async function scrapeAmazonProduct(url: string) {
     const apiUrl = `http://api.scraperapi.com?api_key=${apiKey}&url=${url}`;
     console.log(apiUrl);
     const response = await axios.get(apiUrl);
-
+    const options = {
+      uri: `http://api.scraperapi.com/`,
+      qs: {
+        api_key: API_KEY,
+        url: URL,
+      },
+      resolveWithFullResponse: true,
+    };
     if (response.status !== 200) {
       console.log(`Failed to scrape product - HTTP Status: ${response.status}`);
       return null;
